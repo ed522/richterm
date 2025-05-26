@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: Apache-2.0
-
+//SPDX-License-Identifier: GPL-3.0-only
+#pragma once
 #include <stdint.h>
 
 typedef struct {
@@ -23,3 +23,4 @@ typedef struct {
 
 void render_pane(Pane *pane);
 void render_scene(Scene *scene);
+

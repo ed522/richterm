@@ -1,11 +1,11 @@
-//SPDX-License-Identifier: Apache-2.0 AND CC-BY-SA-3.0
+//SPDX-License-Identifier: GPL-3.0-only
 #pragma once
 
 // The following is adapted from https://en.wikipedia.org/wiki/ANSI_escape_code
 // Permalink: https://en.wikipedia.org/w/index.php?oldid=1291641590
 // As per the terms of use, a link is acceptable attribution
 // The license text may be found here: https://creativecommons.org/licenses/by-sa/4.0/deed.en
-// Licensed under CC-BY-SA. No warranties are provided. See the licence for details.
+// GPL 3.0 is compatible, thus it is used
 
 // Also partially derived from https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 // (no licence provided, but considering the volume of forks and the
@@ -14,7 +14,6 @@
 // All codes have no separators - e.g. all arguments need
 // semicolons in between.
 
-/* == begin CC material == */
 #define C0_BELL					"\x07" // \a
 #define C0_BACKSPACE			"\x08"
 #define C0_TAB					"\x09" // \t
@@ -57,11 +56,11 @@
 #define CSI_GRAPHICS_SGR		"m"
 
 #define CSI_ERASE_CUREND		"0"
-#define CSI_ERASE_CURSTART	"1"
+#define CSI_ERASE_CURSTART		"1"
 #define CSI_ERASE_ALL			"2"
-#define CSI_ERASE_SCRBK		"3"
+#define CSI_ERASE_SCRBK			"3"
 #define CSI_ERSLN_CUREND		"0"
-#define CSI_ERSLN_CURSTART	"1"
+#define CSI_ERSLN_CURSTART		"1"
 #define CSI_ERSLN_ALL			"2"
 
 #define SGR_RESET				"0"
@@ -152,4 +151,8 @@
 #define SGR_COLOUR_TRUE			"2"
 
 #define SGR_TERM				"m"
-/* == end CC material == */
+
+#define FP_PRIV_DEC_DOUBLE_TOP	"#3"
+#define FP_PRIV_DEC_DOUBLE_BOTM	"#4"
+#define FP_PRIV_DEC_SINGLE_LINE	"#5"
+#define FP_PRIV_DEC_DOUBLE_LINE	"#6"
