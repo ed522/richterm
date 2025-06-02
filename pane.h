@@ -13,8 +13,13 @@ typedef struct {
 	char left_edge_char;
 	char right_edge_char;
 
-	int bufferSize;
-	char **data;
+	uint32_t flags;
+	
+	int linecount;
+	int *logical_heights;
+	int *logical_widths;
+
+	char **contents;
 } Pane;
 typedef struct {
 	int count;
@@ -23,4 +28,3 @@ typedef struct {
 
 void render_pane(Pane *pane);
 void render_scene(Scene *scene);
-

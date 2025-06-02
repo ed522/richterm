@@ -1,44 +1,61 @@
 //SPDX-License-Identifier: GPL-3.0-only
 #include "pane.h"
 #include "codes.h"
+#include "term.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void render_pane(Pane *pane) {
 
-	// reset position/clear
-	fputs(FE_CSI CSI_ERASE_ALL CSI_ERASE FE_CSI "0;0" CSI_CURSOR_ABSOLUTE, stdout);
-
+	char *linebuf = malloc((1 + pane->w) * sizeof(char));
+	// clear
+	clear();
 	// go to top left corner
-	printf(FE_CSI "%u;%u" CSI_CURSOR_ABSOLUTE, pane->y + 1, pane->x + 1);
+	move(pane->x, pane->y);
 
-	char str[2] = {pane->top_edge_char, '\0'};
 	for (uint32_t i = 0; i < pane->w + 2; i++) {
-		fputs(str, stdout);
+		fputc(pane->top_edge_char, stdout);
 	}
 	fputs("\n", stdout);
 
 	for (uint32_t i = 0; i < pane->h; i++) {
-		for (uint32_t i = 0; i < pane->x; i++) {
-			fputs(" ", stdout);
+		home();
+		move_horizontal(pane->x);
+		fputc(pane->left_edge_char, stdout);
+		if ((long int) i < pane->linecount){
+			char *line = pane->contents[i];
+			
+			int logical_height = (pane->logical_heights == NULL) ? 1 : pane->logical_heights[i];
+			int len = 
+				(pane->logical_widths == NULL) ? 
+				(int) strlen(line) : pane->logical_widths[i];
+			
+			if (len < (int) pane->w) memcpy(linebuf, line, len);
+			else {
+				memcpy(linebuf, line, pane->w * sizeof(char));
+				linebuf[pane->w] = '\0';
+			}
+			fputs(linebuf, stdout);
+			i += logical_height - 1;
 		}
-		str[0] = pane->left_edge_char;
-		fputs(str, stdout);
-		for (uint32_t i = 0; i < pane->w; i++) {
-			fputs("*", stdout);
-		}
-		str[0] = pane->right_edge_char;
-		fputs(str, stdout);
-		fputs("\n", stdout);
+		move(pane->x + pane->w + 1, pane->y + 1 + i);
+		fputc(pane->right_edge_char, stdout);
+		move_vertical(1);
 	}
+	home();
+	move_horizontal(pane->x);
 	// footer
-	for (uint32_t i = 0; i < pane->x; i++) {
-		fputs(" ", stdout);
-	}
-	str[0] = pane->bottom_edge_char;
 	for (uint32_t i = 0; i < pane->w + 2; i++) {
-		fputs(str, stdout);
+		fputc(pane->bottom_edge_char, stdout);
 	}
 	fputs("\n", stdout);
+	free(linebuf);
 	
+}
+
+void render_scene(Scene *scene) {
+	for (int i = 0; i < scene->count; i++) {
+		render_pane(scene->panes[i]);
+	}
 }

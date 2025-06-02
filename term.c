@@ -5,6 +5,8 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <termios.h>
+#include <string.h>
+#include <errno.h>
 
 // lookup
 char foreground[16][2] = {
@@ -50,7 +52,9 @@ char attrib_table[15][2] = {
 	SGR_PROPORTIONAL, SGR_FRAMED, SGR_CIRCLED, SGR_OVERLINED
 };
 
-uint64_t get_term_size() {
+struct termios *term_before = NULL;
+
+uint64_t get_term_size(void) {
 	uint32_t w, h;
 	struct winsize *size = malloc(sizeof(struct winsize));
 	ioctl(0, TIOCGWINSZ, size);
@@ -58,38 +62,95 @@ uint64_t get_term_size() {
 	h = size->ws_row;
 	return w | ((uint64_t) h << 32);
 }
-uint64_t get_cursor_pos() {
-	uint32_t x, y;
+uint64_t get_cursor_pos(void) {
+	uint32_t x = 0, y = 0;
 	fputs(FE_CSI CSI_GET_CURPOS, stdout);
 	scanf("\x1B[%u;%uR", &y, &x);
+	return x | ((uint64_t) y << 32);
 }
-int enter_raw() {
+/**
+ * Enter raw terminal mode
+ * Returns:
+ *  - on success: 0
+ *  - on syscall error: -1, errno set
+ *  - if the terminal is already raw: -2
+ */
+int enter_raw(void) {
+
 	struct termios *term = malloc(sizeof(struct termios));
 	int result = tcgetattr(0, term);
 	if (result != 0) return result;
+	
+	if (term_before == NULL) {
+		term_before = malloc(sizeof(struct termios));
+		if (term_before == NULL) {
+			return -1;
+		}
+		memcpy(term_before, term, sizeof(struct termios));
+	} else {
+		return -2;
+	}
+	
 	cfmakeraw(term);
-	result = tcsetattr(0, TCSANOW, term);
-	return result;
+	return tcsetattr(0, TCSANOW, term);
+	
 }
-int reset_terminal() {
+/**
+ * Exit raw terminal mode, if it was already entered
+ * Returns:
+ *  - on success: 0
+ *  - on syscall error: -1, errno set
+ *  - if the terminal was never raw, or has already been unrawed/reset: -2
+ */
+int unraw(void) {
+
+	if (term_before == NULL) {
+		return -2;
+	}
+	int result = tcsetattr(0, TCSANOW, term_before);
+	free(term_before);
+	term_before = NULL;
+	if (errno != 0) return -1;
+	return result;
+	
+}
+/**
+ * Reset all characteristics of the terminal, and 
+ * Returns:
+ *  - on success: 0
+ *  - on syscall error: -1, errno set
+ */
+int reset_terminal(void) {
+	if (term_before != NULL) {
+		free(term_before);
+		if (errno != 0) return -1;
+		term_before = NULL;
+	}
 	return system("reset");
 }
 
-void clear() {
+void clear(void) {
 	fputs(FE_CSI CSI_ERASE_ALL CSI_ERASE, stdout);
 }
 
 void move(int x, int y) {
-	printf(FE_CSI "%u;%u" CSI_CURSOR_ABSOLUTE, x, y);
+	printf(FE_CSI "%u;%u" CSI_CURSOR_ABSOLUTE, y + 1, x + 1);
 }
 void move_horizontal(int delta) {
 	if (delta >= 0) {
 		printf(FE_CSI "%u" CSI_CURSOR_FORWARD, delta);
 	} else {
-		printf(FE_CSI "%u" CSI_CURSOR_BACK, delta);
+		printf(FE_CSI "%u" CSI_CURSOR_BACK, -delta);
 	}
 }
-void home() {
+void move_vertical(int delta) {
+	if (delta >= 0) {
+		printf(FE_CSI "%u" CSI_CURSOR_DOWN, delta);
+	} else {
+		printf(FE_CSI "%u" CSI_CURSOR_UP, -delta);
+	}
+}
+void home(void) {
 	fputs("\r", stdout);
 }
 

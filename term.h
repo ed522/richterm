@@ -55,17 +55,18 @@ typedef uint16_t attribute_t;
 #define ATTRIB_CIRCLED		0x2000
 #define ATTRIB_OVERLINE		0x4000
 
-uint64_t get_term_size();
-uint64_t get_cursor_pos();
-int enter_raw();
-int reset_terminal();
+uint64_t get_term_size(void);
+uint64_t get_cursor_pos(void);
+int enter_raw(void);
+int unraw(void);
+int reset_terminal(void);
 
-void clear();
+void clear(void);
 
 void move(int x, int y);
 void move_horizontal(int delta);
 void move_vertical(int delta);
-void home();
+void home(void);
 
 void colour_text(colour_t colour);
 void colour_text_hi_fg(uint8_t colour);
