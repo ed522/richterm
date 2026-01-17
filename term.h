@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-typedef uint8_t colour_t;
-typedef uint16_t attribute_t;
+typedef uint8_t term_colour;
+typedef uint16_t term_attribute;
 
 #define FG_BLACK			0x0
 #define FG_RED				0x1
@@ -68,9 +68,9 @@ void move_horizontal(int delta);
 void move_vertical(int delta);
 void home(void);
 
-void colour_text(colour_t colour);
+void colour_text(term_colour colour);
 void colour_text_hi_fg(uint8_t colour);
 void colour_text_hi_bg(uint8_t colour);
 void colour_text_true_fg(uint32_t colour);
 void colour_text_true_bg(uint32_t colour);
-void modify_text(attribute_t attributes);
+void modify_text(term_attribute attributes);

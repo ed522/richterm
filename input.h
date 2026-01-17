@@ -1,12 +1,12 @@
 #pragma once
 #include <stdint.h>
 
-typedef uint8_t cmod_t;
+typedef uint8_t char_mod;
 
 typedef struct {
 	char key;
-	cmod_t modifiers;
-	void (* callback) (char, cmod_t);
+	char_mod modifiers;
+	void (* callback) (char, char_mod);
 	uint8_t options;
 } Hook;
 
@@ -44,8 +44,8 @@ typedef struct {
 #define SPECIAL_HOME	20
 #define SPECIAL_END	 	21
 
-void hook_plain(char key, cmod_t modifiers, void callback(char, cmod_t), InputState *state);
-void hook_special(char key, cmod_t modifiers, void callback(char, cmod_t), InputState *state);
-void hook_all(void callback(char, cmod_t), InputState *state);
+void hook_plain(char key, char_mod modifiers, void callback(char, char_mod), InputState *state);
+void hook_special(char key, char_mod modifiers, void callback(char, char_mod), InputState *state);
+void hook_all(void callback(char, char_mod), InputState *state);
 void input_start(InputState *state);
 void input_end(InputState *state);

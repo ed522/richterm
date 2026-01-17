@@ -154,7 +154,7 @@ void home(void) {
 	fputs("\r", stdout);
 }
 
-void colour_text(colour_t colour) {
+void colour_text(term_colour colour) {
 	uint8_t fore = colour & 0xF;
 	uint8_t back = (colour & 0xF0) >> 4;
 	printf(FE_CSI "%s;%s" SGR_TERM, foreground[fore], background[back]);
@@ -187,7 +187,7 @@ void colour_text_true_bg(uint32_t colour) {
 	printf(FE_CSI SGR_BG_HICOLOUR ";" SGR_COLOUR_TRUE ";%u;%u;%u" SGR_TERM,
 		r, g, b);
 }
-void modify_text(attribute_t attributes) {
+void modify_text(term_attribute attributes) {
 	fputs(FE_CSI SGR_RESET, stdout); //unterminated
 	uint32_t i = 0;
 	while (attributes != 0) {
